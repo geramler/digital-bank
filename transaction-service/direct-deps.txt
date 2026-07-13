@@ -1,0 +1,6 @@
+
+The following files have been resolved:
+   org.springframework.boot:spring-boot-starter-web:jar:4.0.0:compile
+   org.springframework.boot:spring-boot-starter-test:jar:4.0.0:test
+   org.springdoc:springdoc-openapi-starter-webmvc-ui:jar:2.5.0:compile
+

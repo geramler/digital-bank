@@ -1,0 +1,41 @@
+# ============================================================
+# Digital Bank — Terraform Variables (Example)
+# ============================================================
+# Copy this file to terraform.tfvars and customize as needed.
+# ============================================================
+
+aws_region = "us-east-1"
+environment = "dev"
+
+# VPC
+vpc_cidr = "10.0.0.0/16"
+az_count = 2
+
+# EKS
+eks_cluster_version     = "1.30"
+eks_node_instance_types = ["t3.medium"]
+eks_node_desired_size   = 2
+eks_node_min_size       = 1
+eks_node_max_size       = 4
+
+# RDS PostgreSQL
+db_name              = "digitalbank"
+db_username          = "digitalbank"
+db_password          = "digitalbank"   # CHANGE THIS in production!
+db_instance_class    = "db.t3.micro"
+db_allocated_storage = 20
+
+# ElastiCache Redis
+redis_node_type      = "cache.t3.micro"
+redis_num_cache_nodes = 1
+
+# MSK Kafka
+msk_instance_type         = "kafka.t3.small"
+msk_number_of_broker_nodes = 2
+
+# Tags
+tags = {
+  Project   = "digital-bank"
+  ManagedBy = "terraform"
+  Environment = "dev"
+}

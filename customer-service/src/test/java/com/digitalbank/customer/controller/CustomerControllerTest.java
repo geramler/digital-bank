@@ -9,8 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
+import java.time.Instant;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -49,11 +48,12 @@ class CustomerControllerTest {
     @Test
     void createCustomerReturnsPersistedCustomer() throws Exception {
         // Given
-        Customer savedCustomer = new Customer();
-        savedCustomer.setId(UUID.randomUUID());
-        savedCustomer.setName("Ada Lovelace");
-        savedCustomer.setEmail("ada@example.com");
-        savedCustomer.setCreatedAt(LocalDateTime.now());
+        Customer savedCustomer = Mockito.mock(Customer.class);
+
+        when(savedCustomer.getId()).thenReturn(1L);
+        when(savedCustomer.getName()).thenReturn("Ada Lovelace");
+        when(savedCustomer.getEmail()).thenReturn("ada@example.com");
+        when(savedCustomer.getCreatedAt()).thenReturn(Instant.now());   // ← Fixed: Instant
 
         when(customerService.createCustomer(anyString(), anyString()))
                 .thenReturn(savedCustomer);

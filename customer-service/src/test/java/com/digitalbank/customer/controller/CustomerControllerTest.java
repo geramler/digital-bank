@@ -2,9 +2,12 @@ package com.digitalbank.customer.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import com.digitalbank.customer.service.CustomerService;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -18,7 +21,11 @@ class CustomerControllerTest {
 
     @BeforeEach
     void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new CustomerController()).build();
+        CustomerService customerService = Mockito.mock(CustomerService.class);
+
+        mockMvc = MockMvcBuilders
+        .standaloneSetup(new CustomerController(customerService))
+        .build();
     }
 
     @Test

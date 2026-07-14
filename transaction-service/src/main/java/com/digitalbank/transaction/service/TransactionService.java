@@ -6,13 +6,15 @@ import com.digitalbank.events.TransactionResult;
 import com.digitalbank.events.TransactionStatus;
 import com.digitalbank.events.TransactionType;
 import com.digitalbank.transaction.model.Transaction;
+import com.digitalbank.transaction.outbox.OutboxEvent;
+import com.digitalbank.transaction.outbox.OutboxEventRepository;
 import com.digitalbank.transaction.repository.TransactionRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,15 +26,20 @@ public class TransactionService {
     private static final String TX_COMPLETED_TOPIC = "transaction.completed";
 
     private final TransactionRepository transactionRepository;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final OutboxEventRepository outboxEventRepository;
+    private final ObjectMapper objectMapper;
 
-    public TransactionService(TransactionRepository transactionRepository, KafkaTemplate<String, Object> kafkaTemplate) {
+    public TransactionService(
+            TransactionRepository transactionRepository,
+            OutboxEventRepository outboxEventRepository,
+            ObjectMapper objectMapper) {
         this.transactionRepository = transactionRepository;
-        this.kafkaTemplate = kafkaTemplate;
+        this.outboxEventRepository = outboxEventRepository;
+        this.objectMapper = objectMapper;
     }
 
     @Transactional
-    public Transaction initiateTransaction(Long accountId, String type, BigDecimal amount) {
+    public Transaction initiateTransaction(Long accountId, String type, BigDecimal amount, String accountOwnerEmail) {
         TransactionType txType = parseType(type);
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Amount must be positive");
@@ -41,17 +48,17 @@ public class TransactionService {
             throw new IllegalArgumentException("accountId is required");
         }
 
-        Transaction transaction = transactionRepository.save(new Transaction(accountId, txType.name(), amount));
+        Transaction transaction = transactionRepository.save(new Transaction(accountId, txType.name(), amount, accountOwnerEmail));
 
-        publish(COMMAND_TOPIC, transaction.getId(), TransactionCommand.of(
-                transaction.getId(), accountId, amount, txType));
+        outboxEventRepository.save(OutboxEvent.of(COMMAND_TOPIC, transaction.getId().toString(),
+                TransactionCommand.of(transaction.getId(), accountId, amount, txType), objectMapper));
 
         log.info("Transaction initiated id={} accountId={} type={} amount={}",
                 transaction.getId(), accountId, txType, amount);
         return transaction;
     }
 
-    @org.springframework.kafka.annotation.KafkaListener(topics = "transaction.results", groupId = "transaction-service-results")
+    @KafkaListener(topics = "transaction.results", groupId = "transaction-service-results")
     @Transactional
     public void onTransactionResult(TransactionResult result) {
         Transaction transaction = transactionRepository.findById(result.transactionId())
@@ -77,8 +84,9 @@ public class TransactionService {
         transactionRepository.save(transaction);
 
         TransactionCompletedEvent txEvent = TransactionCompletedEvent.of(
-                transaction.getId(), transaction.getAccountId(), transaction.getType(), transaction.getAmount());
-        publish(TX_COMPLETED_TOPIC, transaction.getId(), txEvent);
+                transaction.getId(), transaction.getAccountId(), transaction.getType(),
+                transaction.getAmount(), transaction.getAccountOwnerEmail());
+        outboxEventRepository.save(OutboxEvent.of(TX_COMPLETED_TOPIC, transaction.getId().toString(), txEvent, objectMapper));
 
         log.info("Transaction id={} completed newBalance={}", transaction.getId(), result.newBalance());
     }
@@ -93,17 +101,6 @@ public class TransactionService {
             return TransactionType.valueOf(type.toUpperCase());
         } catch (IllegalArgumentException | NullPointerException ex) {
             throw new IllegalArgumentException("Unknown transaction type: " + type);
-        }
-    }
-
-    private void publish(String topic, Long key, Object payload) {
-        try {
-            kafkaTemplate.send(topic, key.toString(), payload).get(10, TimeUnit.SECONDS);
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Interrupted while publishing to " + topic, ex);
-        } catch (Exception ex) {
-            throw new IllegalStateException("Could not publish message to " + topic, ex);
         }
     }
 }

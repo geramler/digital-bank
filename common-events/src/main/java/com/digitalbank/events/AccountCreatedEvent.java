@@ -12,9 +12,10 @@ public record AccountCreatedEvent(
     @JsonProperty("customerId") Long customerId,
     @JsonProperty("accountType") String accountType,
     @JsonProperty("initialBalance") BigDecimal initialBalance,
+    @JsonProperty("customerEmail") String customerEmail,
     @JsonProperty("timestamp") @JsonFormat(shape = JsonFormat.Shape.STRING) Instant timestamp
 ) {
-    public static AccountCreatedEvent of(Long accountId, Long customerId, String accountType, BigDecimal initialBalance) {
-        return new AccountCreatedEvent(UUID.randomUUID(), accountId, customerId, accountType, initialBalance, Instant.now());
+    public static AccountCreatedEvent of(Long accountId, Long customerId, String accountType, BigDecimal initialBalance, String customerEmail) {
+        return new AccountCreatedEvent(UUID.randomUUID(), accountId, customerId, accountType, initialBalance, customerEmail, Instant.now());
     }
 }

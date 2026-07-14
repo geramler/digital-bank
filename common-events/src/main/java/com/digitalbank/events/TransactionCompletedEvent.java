@@ -12,9 +12,10 @@ public record TransactionCompletedEvent(
     @JsonProperty("accountId") Long accountId,
     @JsonProperty("type") String type,
     @JsonProperty("amount") BigDecimal amount,
+    @JsonProperty("accountOwnerEmail") String accountOwnerEmail,
     @JsonProperty("timestamp") @JsonFormat(shape = JsonFormat.Shape.STRING) Instant timestamp
 ) {
-    public static TransactionCompletedEvent of(Long transactionId, Long accountId, String type, BigDecimal amount) {
-        return new TransactionCompletedEvent(UUID.randomUUID(), transactionId, accountId, type, amount, Instant.now());
+    public static TransactionCompletedEvent of(Long transactionId, Long accountId, String type, BigDecimal amount, String accountOwnerEmail) {
+        return new TransactionCompletedEvent(UUID.randomUUID(), transactionId, accountId, type, amount, accountOwnerEmail, Instant.now());
     }
 }

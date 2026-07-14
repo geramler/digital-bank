@@ -42,6 +42,9 @@ public class Transaction {
     @Column
     private String failureReason;
 
+    @Column
+    private String accountOwnerEmail;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -53,10 +56,11 @@ public class Transaction {
 
     public Transaction() {}
 
-    public Transaction(Long accountId, String type, BigDecimal amount) {
+    public Transaction(Long accountId, String type, BigDecimal amount, String accountOwnerEmail) {
         this.accountId = accountId;
         this.type = type;
         this.amount = amount;
+        this.accountOwnerEmail = accountOwnerEmail;
         this.status = Status.PENDING;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
@@ -74,6 +78,8 @@ public class Transaction {
     public void setStatus(Status status) { this.status = status; }
     public String getFailureReason() { return failureReason; }
     public void setFailureReason(String failureReason) { this.failureReason = failureReason; }
+    public String getAccountOwnerEmail() { return accountOwnerEmail; }
+    public void setAccountOwnerEmail(String accountOwnerEmail) { this.accountOwnerEmail = accountOwnerEmail; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }

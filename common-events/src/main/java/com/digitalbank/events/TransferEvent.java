@@ -14,22 +14,25 @@ public record TransferEvent(
     @JsonProperty("amount") BigDecimal amount,
     @JsonProperty("type") TransferEventType type,
     @JsonProperty("reason") String reason,
+    @JsonProperty("fromAccountEmail") String fromAccountEmail,
     @JsonProperty("timestamp") @JsonFormat(shape = JsonFormat.Shape.STRING) Instant timestamp
 ) {
     public static TransferEvent initiated(
             Long transferId,
             Long fromAccountId,
             Long toAccountId,
-            BigDecimal amount) {
-        return create(transferId, fromAccountId, toAccountId, amount, TransferEventType.INITIATED, null);
+            BigDecimal amount,
+            String fromAccountEmail) {
+        return create(transferId, fromAccountId, toAccountId, amount, TransferEventType.INITIATED, null, fromAccountEmail);
     }
 
     public static TransferEvent completed(
             Long transferId,
             Long fromAccountId,
             Long toAccountId,
-            BigDecimal amount) {
-        return create(transferId, fromAccountId, toAccountId, amount, TransferEventType.COMPLETED, null);
+            BigDecimal amount,
+            String fromAccountEmail) {
+        return create(transferId, fromAccountId, toAccountId, amount, TransferEventType.COMPLETED, null, fromAccountEmail);
     }
 
     public static TransferEvent failed(
@@ -37,8 +40,9 @@ public record TransferEvent(
             Long fromAccountId,
             Long toAccountId,
             BigDecimal amount,
-            String reason) {
-        return create(transferId, fromAccountId, toAccountId, amount, TransferEventType.FAILED, reason);
+            String reason,
+            String fromAccountEmail) {
+        return create(transferId, fromAccountId, toAccountId, amount, TransferEventType.FAILED, reason, fromAccountEmail);
     }
 
     private static TransferEvent create(
@@ -47,7 +51,8 @@ public record TransferEvent(
             Long toAccountId,
             BigDecimal amount,
             TransferEventType type,
-            String reason) {
+            String reason,
+            String fromAccountEmail) {
         return new TransferEvent(
             UUID.randomUUID(),
             transferId,
@@ -56,6 +61,7 @@ public record TransferEvent(
             amount,
             type,
             reason,
+            fromAccountEmail,
             Instant.now()
         );
     }

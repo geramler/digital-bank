@@ -1,7 +1,9 @@
 package com.digitalbank.customer.controller;
 
+import com.digitalbank.customer.dto.CreateCustomerRequest;
 import com.digitalbank.customer.model.Customer;
 import com.digitalbank.customer.service.CustomerService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,12 +36,8 @@ public class CustomerController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, Object> createCustomer(@RequestBody Map<String, String> request) {
-        String name = request.getOrDefault("name", "Unknown");
-        String email = request.getOrDefault("email", "unknown@example.com");
-
-        Customer customer = customerService.createCustomer(name, email);
-
+    public Map<String, Object> createCustomer(@Valid @RequestBody CreateCustomerRequest request) {
+        Customer customer = customerService.createCustomer(request.name(), request.email());
         return Map.of(
             "id", customer.getId(),
             "name", customer.getName(),

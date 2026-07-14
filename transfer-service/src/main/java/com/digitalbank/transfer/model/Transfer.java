@@ -46,6 +46,9 @@ public class Transfer {
     @Column
     private String failureReason;
 
+    @Column
+    private String fromAccountEmail;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -57,10 +60,11 @@ public class Transfer {
 
     public Transfer() {}
 
-    public Transfer(Long fromAccountId, Long toAccountId, BigDecimal amount) {
+    public Transfer(Long fromAccountId, Long toAccountId, BigDecimal amount, String fromAccountEmail) {
         this.fromAccountId = fromAccountId;
         this.toAccountId = toAccountId;
         this.amount = amount;
+        this.fromAccountEmail = fromAccountEmail;
         this.status = Status.INITIATED;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
@@ -78,6 +82,8 @@ public class Transfer {
     public void setStatus(Status status) { this.status = status; }
     public String getFailureReason() { return failureReason; }
     public void setFailureReason(String failureReason) { this.failureReason = failureReason; }
+    public String getFromAccountEmail() { return fromAccountEmail; }
+    public void setFromAccountEmail(String fromAccountEmail) { this.fromAccountEmail = fromAccountEmail; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }

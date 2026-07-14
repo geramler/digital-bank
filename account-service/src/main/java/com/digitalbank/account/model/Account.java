@@ -26,16 +26,20 @@ public class Account {
     @Column(nullable = false, precision = 19, scale = 4)
     private BigDecimal balance;
 
+    @Column
+    private String customerEmail;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
     public Account() {
     }
 
-    public Account(Long customerId, String accountType, BigDecimal initialBalance) {
+    public Account(Long customerId, String accountType, BigDecimal initialBalance, String customerEmail) {
         this.customerId = customerId;
         this.accountType = accountType;
         this.balance = initialBalance;
+        this.customerEmail = customerEmail;
         this.createdAt = Instant.now();
     }
 
@@ -47,6 +51,8 @@ public class Account {
     public void setAccountType(String accountType) { this.accountType = accountType; }
     public BigDecimal getBalance() { return balance; }
     public void setBalance(BigDecimal balance) { this.balance = balance; }
+    public String getCustomerEmail() { return customerEmail; }
+    public void setCustomerEmail(String customerEmail) { this.customerEmail = customerEmail; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 }

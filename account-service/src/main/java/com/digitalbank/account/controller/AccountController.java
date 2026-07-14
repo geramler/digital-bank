@@ -1,11 +1,11 @@
 package com.digitalbank.account.controller;
 
+import com.digitalbank.account.dto.CreateAccountRequest;
 import com.digitalbank.account.model.Account;
 import com.digitalbank.account.service.AccountService;
-
+import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.Map;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,12 +37,12 @@ public class AccountController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, Object> createAccount(@RequestBody Map<String, Object> request) {
-        Long customerId = toLong(request.get("customerId"));
-        String accountType = request.getOrDefault("accountType", "SAVINGS").toString();
-        BigDecimal initialBalance = toBigDecimal(request.getOrDefault("initialBalance", 0));
+    public Map<String, Object> createAccount(@Valid @RequestBody CreateAccountRequest request) {
+        String accountType = request.accountType() != null ? request.accountType() : "SAVINGS";
+        BigDecimal initialBalance = request.initialBalance() != null ? request.initialBalance() : BigDecimal.ZERO;
 
-        Account account = accountService.createAccount(customerId, accountType, initialBalance);
+        Account account = accountService.createAccount(
+                request.customerId(), accountType, initialBalance, request.customerEmail());
 
         return Map.of(
             "id", account.getId(),
@@ -57,17 +57,5 @@ public class AccountController {
     public Map<String, Object> getBalance(@PathVariable Long accountId) {
         BigDecimal balance = accountService.getBalance(accountId);
         return Map.of("accountId", accountId, "balance", balance.toPlainString());
-    }
-
-    private Long toLong(Object value) {
-        if (value instanceof Number n) return n.longValue();
-        if (value instanceof String s) return Long.parseLong(s);
-        return 1L;
-    }
-
-    private BigDecimal toBigDecimal(Object value) {
-        if (value instanceof Number n) return BigDecimal.valueOf(n.doubleValue());
-        if (value instanceof String s) return new BigDecimal(s);
-        return BigDecimal.ZERO;
     }
 }

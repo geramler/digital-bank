@@ -1,11 +1,13 @@
 package com.digitalbank.transaction.controller;
 
+import com.digitalbank.transaction.service.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -15,10 +17,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class TransactionControllerTest {
 
     private MockMvc mockMvc;
+    private TransactionService transactionService;
 
     @BeforeEach
     void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new TransactionController()).build();
+        transactionService = mock(TransactionService.class);
+        mockMvc = MockMvcBuilders.standaloneSetup(new TransactionController(transactionService)).build();
     }
 
     @Test

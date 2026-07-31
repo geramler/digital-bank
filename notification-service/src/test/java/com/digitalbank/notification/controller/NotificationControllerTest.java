@@ -1,11 +1,13 @@
 package com.digitalbank.notification.controller;
 
+import com.digitalbank.notification.repository.NotificationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -15,10 +17,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class NotificationControllerTest {
 
     private MockMvc mockMvc;
+    private NotificationRepository notificationRepository;
 
     @BeforeEach
     void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new NotificationController()).build();
+        notificationRepository = mock(NotificationRepository.class);
+        mockMvc = MockMvcBuilders.standaloneSetup(new NotificationController(notificationRepository)).build();
     }
 
     @Test

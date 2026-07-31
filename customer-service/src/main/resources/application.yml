@@ -6,7 +6,7 @@ spring:
     name: customer-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/digitalbank
+    url: jdbc:postgresql://postgres:5432/digitalbank
     username: digitalbank
     password: digitalbank
     driver-class-name: org.postgresql.Driver
@@ -14,20 +14,25 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
-  kafka:
-    bootstrap-servers: localhost:9092
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        spring.json.trusted.packages: "com.digitalbank.events"
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
 
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - traceId=%X{traceId:-} %msg%n"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    enabled: false

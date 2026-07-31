@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Connectivity Test</h1>
+    <button onclick="testCustomerAPI()">Test Customer API</button>
+    <div id="result"></div>
+
+    <script>
+        async function testCustomerAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                // Test customer service health
+                const healthResponse = await fetch('http://localhost:8082/customers/health');
+                const healthText = await healthResponse.text();
+                
+                // Test creating a customer
+                const customerResponse = await fetch('http://localhost:8082/customers', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: 'Test Customer',
+                        email: 'test' + Date.now() + '@example.com'
+                    })
+                });
+                
+                const customerData = await customerResponse.json();
+                
+                resultDiv.innerHTML = `
+                    <h3>API Test Results:</h3>
+                    <p><strong>Health Endpoint:</strong> ${healthText}</p>
+                    <p><strong>Customer Creation:</strong> Success!</p>
+                    <p><strong>Customer ID:</strong> ${customerData.id}</p>
+                    <p><strong>Customer Name:</strong> ${customerData.name}</p>
+                    <p><strong>Customer Email:</strong> ${customerData.email}</p>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h3>API Test Failed:</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <p>This could be due to CORS issues or network connectivity problems.</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

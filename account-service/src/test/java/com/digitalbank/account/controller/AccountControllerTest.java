@@ -18,7 +18,7 @@ class AccountControllerTest {
 
     @BeforeEach
     void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new AccountController()).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(new AccountController(null)).build();
     }
 
     @Test

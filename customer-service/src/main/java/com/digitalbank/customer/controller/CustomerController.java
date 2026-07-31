@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.Map;
 
 @RestController
 @RequestMapping("/customers")
+@CrossOrigin(origins = "http://localhost:3000")
 public class CustomerController {
 
     private final CustomerService customerService;
